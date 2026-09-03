@@ -11,13 +11,13 @@ const STORE_CONFIG = {
   description: "Cosméticos premium selecionados com cuidado para você brilhar a cada dia.",
   
   // === CONTATO (preencha com dados REAIS antes de publicar) ===
-  whatsapp: "",      // Formato: 5511987654321 (55 + DDD + número, sem símbolos)
+  whatsapp: "11945661766",      // Formato: 5511987654321 (55 + DDD + número, sem símbolos)
   phone: "",         // Formato: (11) 99999-9999 (opcional)
-  email: "",         // exemplo@email.com (opcional)
-  address: "",       // Rua Nome, 123 — Bairro, São Paulo, SP (se houver retirada física)
+  email: "bcbeautymake@gmail.com",         // exemplo@email.com (opcional)
+  address: "Rua Onze De Abril, 2",       // Rua Nome, 123 — Bairro, São Paulo, SP (se houver retirada física)
   
   // === REDES SOCIAIS (deixar vazio se ainda não tiver) ===
-  instagram: "",     // username SEM @
+  instagram: "bcbeauty.oficial",     // username SEM @
   tiktok: "",        // username SEM @
   
   // === CONFIGURAÇÃO DE LOJA ===
@@ -73,27 +73,4 @@ const STORE_LINKS = {
   },
 };
 
-// Dados de exemplo para demo (remover quando tiver dados reais)
-const DEMO_TESTIMONIALS = [
-  {
-    id: 1,
-    name: "Mariana",
-    rating: 5,
-    text: "Adorei! Os produtos chegaram rápido e a qualidade é excelente.",
-    product: "Lip Oil Vivai"
-  },
-  {
-    id: 2,
-    name: "Julia",
-    rating: 5,
-    text: "Atendimento muito bom via WhatsApp, recomendo!",
-    product: "Black Mask"
-  },
-  {
-    id: 3,
-    name: "Sofia",
-    rating: 4.5,
-    text: "Voltei a comprar! Produtos de verdade funcionam.",
-    product: "Sérum Vitamina C"
-  }
-];
+
