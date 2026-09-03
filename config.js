@@ -11,7 +11,7 @@ const STORE_CONFIG = {
   description: "Cosméticos premium selecionados com cuidado para você brilhar a cada dia.",
   
   // === CONTATO (preencha com dados REAIS antes de publicar) ===
-  whatsapp: "1145661766",      // Formato: 5511987654321 (55 + DDD + número, sem símbolos)
+  whatsapp: "11945661766",      // Formato: 5511987654321 (55 + DDD + número, sem símbolos)
   phone: "",         // Formato: (11) 99999-9999 (opcional)
   email: "bcbeauty@gmail.com",         // exemplo@email.com (opcional)
   address: "Rua Onze de Abril, 2",       // Rua Nome, 123 — Bairro, São Paulo, SP (se houver retirada física)
