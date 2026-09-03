@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="description" content="B&C BEAUTY — Cosméticos premium selecionados com cuidado. Beleza, cuidado e bem-estar em um só lugar. Compre com segurança via WhatsApp.">
+  <meta name="keywords" content="cosméticos, beleza, maquiagem, skincare, lábios, make up, produtos de beleza premium">
+  <meta name="theme-color" content="#5b2333">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  
+  <!-- Open Graph / Meta Tags para compartilhamento -->
+  <meta property="og:title" content="B&C BEAUTY | Cosméticos Premium">
+  <meta property="og:description" content="Beleza, cuidado e bem-estar em um só lugar. Produtos selecionados com cuidado.">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="pt_BR">
+  <meta property="og:url" content="https://bcbeauty.com">
+  
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="B&C BEAUTY | Cosméticos Premium">
+  <meta name="twitter:description" content="Cosméticos selecionados para o seu dia a dia. Compre via WhatsApp.">
+  
+  <!-- Canonical (atualizar com URL real) -->
+  <link rel="canonical" href="https://bcbeauty.com">
+  
+  <!-- Favicon (adicione quando tiver) -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='75' font-size='75' fill='%235b2333'>💄</text></svg>">
+  
+  <!-- Fontes otimizadas -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- CSS -->
+  <link rel="stylesheet" href="css/style.css">
+  
+  <!-- Robots e indexação -->
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+  
+  <title>B&C BEAUTY | Cosméticos Premium</title>
+</head>
+<body>
+  <!-- V-Libras Button (Videoconferência em Libras) -->
+  <script type="text/javascript" src="https://vlibras.gov.br/app.js"></script>
+  <div vw class="enabled">
+    <button vw-access-button class="vw-button-libras" title="Acessibilidade em Libras">Acessibilidade</button>
+    <div vw-plugin-wrapper>
+      <div class="vw-plugin" vw-plugin-type="top_right"></div>
+    </div>
+  </div>
+
+  <!-- ============ HEADER ============ -->
+  <header class="site-header" role="banner">
+    <div class="container header-inner">
+      <a href="#inicio" class="logo" aria-label="B&C BEAUTY — Ir para início">
+        B&amp;C <span>BEAUTY</span>
+      </a>
+
+      <!-- Navbar — apenas informações da loja -->
+      <nav class="main-nav" id="mainNav" role="navigation" aria-label="Navegação principal">
+        <a href="#inicio" class="nav-link active" data-nav="inicio">Início</a>
+        <a href="#produtos" class="nav-link" data-nav="produtos">Produtos</a>
+        <a href="#testimonios" class="nav-link" data-nav="testimonios">Avaliações</a>
+        <a href="#perfil" class="nav-link" id="perfilLink" data-nav="perfil">Meu Perfil</a>
+      </nav>
+
+      <!-- Header Actions -->
+      <div class="header-actions">
+        <button class="btn-icon cart-btn" id="openCartBtn" aria-label="Abrir carrinho" aria-expanded="false">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="9" cy="21" r="1"></circle>
+            <circle cx="20" cy="21" r="1"></circle>
+            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+          </svg>
+          <span class="cart-count hidden" id="cartCount">0</span>
+        </button>
+        <button class="hamburger" id="hamburgerBtn" aria-label="Menu" aria-expanded="false">
+          <span></span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ============ HERO ============ -->
+  <section class="hero" id="inicio" aria-label="Seção de boas-vindas">
+    <div class="container hero-inner">
+      <div class="hero-content">
+        <h1>Beleza e Cuidado Premium</h1>
+        <p class="lead">Produtos selecionados com cuidado para você brilhar a cada dia.</p>
+        <a href="#produtos" class="btn btn-primary">Explorar Produtos</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ BENEFÍCIOS ============ -->
+  <section class="benefits-section" aria-label="Benefícios">
+    <div class="container benefits-grid" id="benefitsGrid">
+      <!-- Preenchido dinamicamente -->
+    </div>
+  </section>
+
+  <!-- ============ PRODUTOS ============ -->
+  <section class="products-section" id="produtos" aria-label="Catálogo de produtos">
+    <div class="container">
+      <h2>Nossos Produtos</h2>
+      
+      <!-- Busca e filtros -->
+      <div class="toolbar">
+        <div class="search-box">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"></circle>
+            <path d="m21 21-4.35-4.35"></path>
+          </svg>
+          <input type="search" id="searchInput" placeholder="Buscar produtos..." aria-label="Buscar produtos">
+        </div>
+        <select class="filter-select" id="categoryFilter" aria-label="Filtrar por categoria">
+          <option value="todos">Todas as categorias</option>
+          <option value="Maquiagem">Maquiagem</option>
+          <option value="Lábios">Lábios</option>
+          <option value="Olhos">Olhos</option>
+          <option value="Rosto">Rosto</option>
+          <option value="Skincare">Skincare</option>
+        </select>
+        <select class="filter-select" id="sortFilter" aria-label="Ordenar produtos">
+          <option value="relevancia">Mais relevantes</option>
+          <option value="menor-preco">Menor preço</option>
+          <option value="maior-preco">Maior preço</option>
+          <option value="melhor-avaliacao">Melhor avaliação</option>
+          <option value="alfabetica">A-Z</option>
+        </select>
+      </div>
+
+      <!-- Grid de produtos -->
+      <div class="products-grid" id="productsGrid" role="main">
+        <!-- Preenchido dinamicamente -->
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ AVALIAÇÕES ============ -->
+  <section class="testimonials-section" id="testimonios" aria-label="Avaliações de clientes">
+    <div class="container">
+      <h2>O que Nossos Clientes Dizem</h2>
+      <div class="testimonials-grid" id="testimonialsGrid">
+        <!-- Preenchido dinamicamente -->
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ PERFIL DO CLIENTE ============ -->
+  <section class="profile-section" id="perfil" aria-label="Perfil do cliente">
+    <div class="container">
+      <div class="profile-content">
+        <h2 id="profileTitle">Criar Meu Perfil</h2>
+        <form id="profileForm" class="profile-form" aria-label="Formulário de perfil">
+          <input type="text" id="profileName" placeholder="Seu nome completo" maxlength="80" required aria-label="Nome completo">
+          <input type="email" id="profileEmail" placeholder="Seu e-mail" maxlength="120" required aria-label="E-mail">
+          <input type="tel" id="profilePhone" placeholder="Seu WhatsApp/Telefone" maxlength="20" aria-label="Telefone">
+          <button type="submit" class="btn btn-primary">Salvar Perfil</button>
+          <button type="button" id="clearProfileBtn" class="btn btn-outline hidden">Limpar Dados</button>
+        </form>
+        <div id="profileInfo" class="profile-info hidden">
+          <p>Perfil salvo com sucesso!</p>
+          <p id="profileDisplay"></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ CARRINHO (Drawer) ============ -->
+  <div class="cart-overlay" id="cartOverlay" aria-hidden="true">
+    <aside class="cart-drawer" role="complementary" aria-label="Carrinho de compras">
+      <div class="cart-header">
+        <h3>Seu Carrinho</h3>
+        <button class="btn-icon" id="closeCartBtn" aria-label="Fechar carrinho">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+      <div class="cart-items" id="cartItems" role="region" aria-live="polite"></div>
+      <div class="cart-footer" id="cartFooter"></div>
+    </aside>
+  </div>
+
+  <!-- ============ MODAL PRODUTO ============ -->
+  <div class="modal-overlay" id="productModal" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="modal">
+      <button class="btn-icon modal-close" id="closeModalBtn" aria-label="Fechar">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+      <div class="modal-grid">
+        <div class="modal-media" id="modalMedia"></div>
+        <div class="modal-info">
+          <h2 id="modalProductName"></h2>
+          <div class="rating-line" id="modalRating"></div>
+          <p id="modalDescription"></p>
+          <div class="price-section">
+            <span class="price" id="modalPrice"></span>
+            <span class="sale-price hidden" id="modalSalePrice"></span>
+          </div>
+          <div class="qty-selector">
+            <button type="button" id="qtyMinus" aria-label="Diminuir quantidade">−</button>
+            <span class="qty-value" id="qtyValue">1</span>
+            <button type="button" id="qtyPlus" aria-label="Aumentar quantidade">+</button>
+          </div>
+          <button class="btn btn-primary" id="modalAddToCart" style="width:100%">Adicionar ao Carrinho</button>
+          <div id="stockStatus"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ TOAST ============ -->
+  <div class="toast" id="toast" role="status" aria-live="polite" aria-atomic="true"></div>
+
+  <!-- ============ BOTÃO VOLTAR AO TOPO ============ -->
+  <button class="back-to-top" id="backToTopBtn" aria-label="Voltar ao topo">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <polyline points="18 15 12 9 6 15"></polyline>
+    </svg>
+  </button>
+
+  <!-- ============ FOOTER ============ -->
+  <footer class="site-footer" role="contentinfo">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <h3>B&C BEAUTY</h3>
+          <p id="footerTagline">Beleza, cuidado e bem-estar em um só lugar.</p>
+          <div class="social-links" id="socialLinks"></div>
+        </div>
+        <div class="footer-col">
+          <h4>Navegação</h4>
+          <ul role="list">
+            <li><a href="#inicio">Início</a></li>
+            <li><a href="#produtos">Produtos</a></li>
+            <li><a href="#testimonios">Avaliações</a></li>
+            <li><a href="#perfil">Meu Perfil</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Contato</h4>
+          <div id="footerContact" role="list"></div>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; <span id="year"></span> B&C BEAUTY. Todos os direitos reservados.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ============ STRUCTURED DATA (JSON-LD) ============ -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org/",
+    "@type": "Organization",
+    "name": "B&C BEAUTY",
+    "url": "https://bcbeauty.com",
+    "description": "Cosméticos premium selecionados com cuidado",
+    "image": "https://bcbeauty.com/logo.png",
+    "contactPoint": {
+      "@type": "ContactPoint",
+      "contactType": "Customer Support",
+      "availableLanguage": ["pt-BR"]
+    },
+    "sameAs": [
+      "https://instagram.com/bcbeauty",
+      "https://tiktok.com/@bcbeauty"
+    ]
+  }
+  </script>
+
+  <!-- ============ SCRIPTS ============ -->
+  <script src="config.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/products.js"></script>
+  <script src="js/cart.js"></script>
+  <script src="js/profile.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
