@@ -42,10 +42,13 @@
   <title>B&C BEAUTY | Cosméticos Premium</title>
 </head>
 <body>
-  <!-- V-Libras Button (Videoconferência em Libras) -->
+  <!-- Skip to main content (acessibilidade) -->
+  <a href="#mainContent" class="skip-to-main">Pular para conteúdo principal</a>
+
+  <!-- V-Libras Button (Videoconferência em Libras) - Acessibilidade em Libras -->
   <script type="text/javascript" src="https://vlibras.gov.br/app.js"></script>
   <div vw class="enabled">
-    <button vw-access-button class="vw-button-libras" title="Acessibilidade em Libras">Acessibilidade</button>
+    <button vw-access-button class="vw-button-libras" title="Acessibilidade em Libras - Intérprete Virtual de Libras">Acessibilidade em Libras</button>
     <div vw-plugin-wrapper>
       <div class="vw-plugin" vw-plugin-type="top_right"></div>
     </div>
@@ -149,6 +152,20 @@
     </div>
   </section>
 
+  <!-- ============ AVALIAÇÕES DA LOJA ============ -->
+  <section class="ratings-section" id="storeRatings" aria-label="Avaliações da loja">
+    <div class="container">
+      <h2>Avaliações de Clientes</h2>
+      <div id="storeRatingsSection" role="region" aria-live="polite">
+        <!-- Preenchido dinamicamente -->
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ AVALIAÇÕES DE PRODUTOS (Modal) ============ -->
+  <div id="productRatings" class="hidden" aria-label="Avaliações do produto"></div>
+  <div id="productRatingForm" class="hidden" aria-label="Formulário de avaliação do produto"></div>
+
   <!-- ============ PERFIL DO CLIENTE ============ -->
   <section class="profile-section" id="perfil" aria-label="Perfil do cliente">
     <div class="container">
@@ -170,7 +187,7 @@
   </section>
 
   <!-- ============ CARRINHO (Drawer) ============ -->
-  <div class="cart-overlay" id="cartOverlay" aria-hidden="true">
+  <div class="cart-overlay" id="cartOverlay" aria-hidden="true" role="region" aria-label="Carrinho de compras">
     <aside class="cart-drawer" role="complementary" aria-label="Carrinho de compras">
       <div class="cart-header">
         <h3>Seu Carrinho</h3>
@@ -210,8 +227,14 @@
             <span class="qty-value" id="qtyValue">1</span>
             <button type="button" id="qtyPlus" aria-label="Aumentar quantidade">+</button>
           </div>
-          <button class="btn btn-primary" id="modalAddToCart" style="width:100%">Adicionar ao Carrinho</button>
+          <button class="btn btn-primary" style="width:100%">Adicionar ao Carrinho</button>
           <div id="stockStatus"></div>
+
+          <!-- ============ AVALIAÇÕES DO PRODUTO (Modal) ============ -->
+          <hr style="margin: 20px 0; border: none; border-top: 1px solid var(--color-border);">
+          <h3 style="color: var(--color-primary); margin-top: 20px; margin-bottom: 10px;">Avaliações</h3>
+          <div id="productRatings" role="region" aria-live="polite"></div>
+          <div id="productRatingForm" role="region"></div>
         </div>
       </div>
     </div>
@@ -283,6 +306,7 @@
   <script src="js/products.js"></script>
   <script src="js/cart.js"></script>
   <script src="js/profile.js"></script>
+  <script src="js/ratings.js"></script>
   <script src="js/ui.js"></script>
   <script src="js/app.js"></script>
 </body>

@@ -29,25 +29,28 @@ const UI = {
       ? `<span class="product-badge">${this.escapeHtml(product.badge)}</span>`
       : "";
 
+    const { average } = Ratings.getProductRating(product.id);
+
     return `
-      <div class="product-card" data-id="${product.id}">
-        <div class="product-media">
-          ${badge}
-          <img src="${this.escapeHtml(product.image)}" alt="${this.escapeHtml(product.name)}" loading="lazy">
-        </div>
-        <div class="product-body">
-          <h3 class="product-name">${this.escapeHtml(product.name)}</h3>
-          <div class="product-rating">
-            <span class="stars">${Products.formatStars(product.rating)}</span>
-            <span>(${product.reviews})</span>
+      <div class="product-card" data-id="${product.id}" role="article" aria-label="Produto: ${this.escapeHtml(product.name)}">
+        <button class="product-card-link" data-action="view-product" aria-label="Ver detalhes de ${this.escapeHtml(product.name)}" style="width:100%;text-align:left;border:none;background:none;padding:0;cursor:pointer;">
+          <div class="product-media">
+            ${badge}
+            <img src="${this.escapeHtml(product.image)}" alt="${this.escapeHtml(product.name)}" loading="lazy" aria-hidden="false">
           </div>
-          <div class="product-price ${product.salePrice ? "sale" : ""}">
-            ${priceDisplay}
+          <div class="product-body">
+            <h3 class="product-name">${this.escapeHtml(product.name)}</h3>
+            <div class="product-rating">
+              <span class="stars" aria-label="Avaliação: ${average.toFixed(1)} de 5 estrelas">${Products.formatStars(product.rating)}</span>
+              <span>(${product.reviews})</span>
+            </div>
+            <div class="product-price ${product.salePrice ? "sale" : ""}">
+              ${priceDisplay}
+            </div>
           </div>
-          <div class="product-actions">
-            <button class="btn btn-outline btn-sm" data-action="view-product">Ver</button>
-            <button class="btn btn-primary btn-sm" data-action="add-cart">Adicionar</button>
-          </div>
+        </button>
+        <div class="product-actions">
+          <button class="btn btn-primary btn-sm" data-action="add-cart" aria-label="Adicionar ${this.escapeHtml(product.name)} ao carrinho">Adicionar</button>
         </div>
       </div>
     `;
@@ -180,16 +183,25 @@ const UI = {
 
   renderBenefits() {
     const container = document.getElementById("benefitsGrid");
-    const benefits = STORE_CONFIG.benefits;
-    const icons = ["🎯", "💬", "🚚"];
+    const benefits = STORE_CONFIG.benefits || [];
 
+    // BUG FIX #2: Suportar benefícios estruturados com ícones
     container.innerHTML = benefits
-      .map((benefit, idx) => `
-        <div class="benefit-card">
-          <div class="benefit-icon">${icons[idx] || "✓"}</div>
-          <h3>${this.escapeHtml(benefit)}</h3>
-        </div>
-      `)
+      .map((benefit) => {
+        // Se benefício for objeto com icon e title, use-o
+        const isObject = typeof benefit === 'object' && benefit !== null;
+        const icon = isObject ? benefit.icon : "✓";
+        const title = isObject ? benefit.title : benefit;
+        const desc = isObject ? benefit.desc : "";
+
+        return `
+          <div class="benefit-card">
+            <div class="benefit-icon">${icon}</div>
+            <h3>${this.escapeHtml(title)}</h3>
+            ${desc ? `<p>${this.escapeHtml(desc)}</p>` : ""}
+          </div>
+        `;
+      })
       .join("");
   },
 
@@ -240,7 +252,8 @@ const UI = {
       items.push(`<span>📍 ${this.escapeHtml(STORE_CONFIG.address)}</span>`);
     }
 
-    container.innerHTML = items.join("") || "<p>Contato em breve</p>";
+    // BUG FIX #5: Verificar items.length em vez de items.join("")
+    container.innerHTML = items.length > 0 ? items.join("") : "<p>Contato em breve</p>";
   },
 
   showToast(message) {
@@ -251,13 +264,17 @@ const UI = {
   },
 
   openCart() {
-    document.getElementById("cartOverlay").classList.add("open");
+    const overlay = document.getElementById("cartOverlay");
+    overlay.classList.add("open");
+    overlay.setAttribute("aria-hidden", "false");
     document.body.style.overflow = "hidden";
     this.renderCart();
   },
 
   closeCart() {
-    document.getElementById("cartOverlay").classList.remove("open");
+    const overlay = document.getElementById("cartOverlay");
+    overlay.classList.remove("open");
+    overlay.setAttribute("aria-hidden", "true");
     document.body.style.overflow = "";
   },
 
@@ -287,5 +304,224 @@ const UI = {
     const badge = document.getElementById("cartCount");
     badge.textContent = count;
     badge.classList.toggle("hidden", count === 0);
+  },
+
+  // ============ Renderizar Avaliações de Produto ============
+  renderProductRatings(productId) {
+    const container = document.getElementById("productRatings");
+    if (!container) return;
+
+    const ratings = Ratings.getProductRatings(productId);
+    const { average, count } = Ratings.getProductRating(productId);
+
+    let html = `
+      <div class="ratings-summary">
+        <div class="rating-stats">
+          <div class="rating-average">
+            <span class="rating-number">${average.toFixed(1)}</span>
+            <span class="rating-stars">${Ratings.formatStars(average)}</span>
+          </div>
+          <span class="rating-count">${count} ${count === 1 ? 'avaliação' : 'avaliações'}</span>
+        </div>
+      </div>
+
+      <div class="ratings-list">
+        ${ratings.length === 0 
+          ? '<p class="no-ratings">Nenhuma avaliação ainda. Seja o primeiro a avaliar!</p>'
+          : ratings.map(r => `
+              <div class="rating-item" role="article">
+                <div class="rating-header">
+                  <span class="rating-name">${this.escapeHtml(r.name)}</span>
+                  <span class="rating-stars">${Ratings.formatStars(r.rating)}</span>
+                </div>
+                ${r.title ? `<div class="rating-title">${this.escapeHtml(r.title)}</div>` : ''}
+                <p class="rating-text">${this.escapeHtml(r.text)}</p>
+                <time class="rating-date" datetime="${r.date}">
+                  ${new Date(r.date).toLocaleDateString('pt-BR')}
+                </time>
+              </div>
+            `).join('')
+        }
+      </div>
+    `;
+
+    container.innerHTML = html;
+  },
+
+  // ============ Renderizar Formulário de Avaliação de Produto ============
+  renderProductRatingForm(productId) {
+    const container = document.getElementById("productRatingForm");
+    if (!container) return;
+
+    container.innerHTML = `
+      <form class="rating-form" id="addProductRatingForm" data-product-id="${productId}">
+        <h4>Compartilhe sua experiência</h4>
+        
+        <div class="form-group">
+          <label for="ratingName">Seu nome (opcional)</label>
+          <input 
+            type="text" 
+            id="ratingName" 
+            class="rating-input"
+            placeholder="Como você gostaria de ser identificado?"
+            maxlength="60"
+            aria-label="Seu nome"
+          >
+        </div>
+
+        <div class="form-group">
+          <label for="ratingStars">Avaliação</label>
+          <div class="star-picker" id="productStarPicker" role="group" aria-label="Avaliação em estrelas">
+            <button type="button" class="star" data-rating="1" aria-label="1 estrela">★</button>
+            <button type="button" class="star" data-rating="2" aria-label="2 estrelas">★</button>
+            <button type="button" class="star" data-rating="3" aria-label="3 estrelas">★</button>
+            <button type="button" class="star" data-rating="4" aria-label="4 estrelas">★</button>
+            <button type="button" class="star" data-rating="5" aria-label="5 estrelas">★</button>
+          </div>
+          <input type="hidden" id="ratingValue" value="0" aria-hidden="true">
+        </div>
+
+        <div class="form-group">
+          <label for="ratingTitle">Título (opcional)</label>
+          <input 
+            type="text" 
+            id="ratingTitle" 
+            class="rating-input"
+            placeholder="Ex: Excelente qualidade!"
+            maxlength="100"
+            aria-label="Título da avaliação"
+          >
+        </div>
+
+        <div class="form-group">
+          <label for="ratingText">Seu comentário</label>
+          <textarea 
+            id="ratingText" 
+            class="rating-textarea"
+            rows="4"
+            placeholder="Compartilhe sua experiência com este produto..."
+            maxlength="500"
+            required
+            aria-label="Sua avaliação"
+            aria-required="true"
+          ></textarea>
+          <small id="charCount" class="char-count">0/500 caracteres</small>
+        </div>
+
+        <div id="ratingFormMsg" class="form-message hidden" role="status" aria-live="polite"></div>
+
+        <button type="submit" class="btn btn-primary" style="width: 100%;">
+          Enviar Avaliação
+        </button>
+      </form>
+    `;
+
+    // Setup star picker
+    setupProductStarPicker();
+    setupProductRatingForm(productId);
+  },
+
+  // ============ Renderizar Avaliações da Loja ============
+  renderStoreRatings() {
+    const container = document.getElementById("storeRatingsSection");
+    if (!container) return;
+
+    const ratings = Ratings.getStoreRatings();
+    const { average, count } = Ratings.getStoreRating();
+
+    container.innerHTML = `
+      <div class="store-ratings-wrapper">
+        <div class="ratings-summary">
+          <div class="rating-stats">
+            <h3>Avaliações da Loja</h3>
+            <div class="rating-average">
+              <span class="rating-number">${average.toFixed(1)}</span>
+              <span class="rating-stars">${Ratings.formatStars(average)}</span>
+            </div>
+            <span class="rating-count">${count} ${count === 1 ? 'avaliação' : 'avaliações'}</span>
+          </div>
+        </div>
+
+        <div class="ratings-list">
+          ${ratings.length === 0 
+            ? '<p class="no-ratings">Nenhuma avaliação ainda. Seja o primeiro a avaliar a loja!</p>'
+            : ratings.map(r => `
+                <div class="rating-item" role="article">
+                  <div class="rating-header">
+                    <span class="rating-name">${this.escapeHtml(r.name)}</span>
+                    <span class="rating-stars">${Ratings.formatStars(r.rating)}</span>
+                  </div>
+                  <p class="rating-text">${this.escapeHtml(r.text)}</p>
+                  <time class="rating-date" datetime="${r.date}">
+                    ${new Date(r.date).toLocaleDateString('pt-BR')}
+                  </time>
+                </div>
+              `).join('')
+          }
+        </div>
+      </div>
+
+      <div id="storeRatingForm"></div>
+    `;
+  },
+
+  // ============ Renderizar Formulário de Avaliação da Loja ============
+  renderStoreRatingForm() {
+    const container = document.getElementById("storeRatingForm");
+    if (!container) return;
+
+    container.innerHTML = `
+      <form class="rating-form" id="addStoreRatingForm">
+        <h4>Avalie nossa loja</h4>
+        
+        <div class="form-group">
+          <label for="storeRatingName">Seu nome (opcional)</label>
+          <input 
+            type="text" 
+            id="storeRatingName" 
+            class="rating-input"
+            placeholder="Como você gostaria de ser identificado?"
+            maxlength="60"
+            aria-label="Seu nome"
+          >
+        </div>
+
+        <div class="form-group">
+          <label for="storeRatingStars">Sua avaliação</label>
+          <div class="star-picker" id="storeStarPicker" role="group" aria-label="Avaliação da loja em estrelas">
+            <button type="button" class="star" data-rating="1" aria-label="1 estrela">★</button>
+            <button type="button" class="star" data-rating="2" aria-label="2 estrelas">★</button>
+            <button type="button" class="star" data-rating="3" aria-label="3 estrelas">★</button>
+            <button type="button" class="star" data-rating="4" aria-label="4 estrelas">★</button>
+            <button type="button" class="star" data-rating="5" aria-label="5 estrelas">★</button>
+          </div>
+          <input type="hidden" id="storeRatingValue" value="0" aria-hidden="true">
+        </div>
+
+        <div class="form-group">
+          <label for="storeRatingText">Seu comentário</label>
+          <textarea 
+            id="storeRatingText" 
+            class="rating-textarea"
+            rows="4"
+            placeholder="Sua opinião sobre a loja, atendimento, entrega, etc..."
+            maxlength="500"
+            required
+            aria-label="Sua avaliação da loja"
+            aria-required="true"
+          ></textarea>
+          <small class="char-count">0/500 caracteres</small>
+        </div>
+
+        <div id="storeRatingFormMsg" class="form-message hidden" role="status" aria-live="polite"></div>
+
+        <button type="submit" class="btn btn-primary" style="width: 100%;">
+          Enviar Avaliação
+        </button>
+      </form>
+    `;
+
+    setupStoreStarPicker();
+    setupStoreRatingForm();
   }
 };

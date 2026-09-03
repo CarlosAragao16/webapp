@@ -24,7 +24,9 @@ document.addEventListener("DOMContentLoaded", async () => {
   // Renderizar interface inicial
   updateProductsDisplay();
   UI.renderBenefits();
-  UI.renderTestimonials(DEMO_TESTIMONIALS);
+  // Não renderizar testimoniais fictícias - apenas carregar avaliações reais
+  UI.renderStoreRatings();
+  UI.renderStoreRatingForm();
   UI.renderSocialLinks();
   UI.renderFooterContact();
   UI.updateCartCount();
@@ -98,10 +100,18 @@ function setupProductsSection() {
     const productId = Number(card?.dataset.id);
 
     if (btn.dataset.action === "view-product") {
+      // Abrir modal ao clicar no card
       const product = UI.openModal(productId);
       if (product) {
         AppState.currentProductId = productId;
         AppState.currentQty = 1;
+        // Renderizar avaliações do produto no modal
+        if (document.getElementById("productRatings")) {
+          UI.renderProductRatings(productId);
+        }
+        if (document.getElementById("productRatingForm")) {
+          UI.renderProductRatingForm(productId);
+        }
         setupModalEvents(product);
       }
     } else if (btn.dataset.action === "add-cart") {
@@ -125,49 +135,66 @@ function updateProductsDisplay() {
 // ============ Modal de Produto ============
 
 function setupModalEvents(product) {
+  if (!product) return;
+
   const modal = document.getElementById("productModal");
   const qtyValue = document.getElementById("qtyValue");
-  const addBtn = document.getElementById("addToCartBtn");
+  // BUG FIX #1: ID corrigido (era addToCartBtn, deveria ser id do modal renderizado)
+  const addBtn = modal.querySelector(".modal-info button[style*='100%']");
 
-  // Botão de fechar
-  modal.querySelector(".modal-close")?.addEventListener("click", () => {
-    UI.closeModal();
-  });
+  if (!addBtn) {
+    console.error("Botão 'Adicionar ao Carrinho' não encontrado no modal");
+    return;
+  }
+
+  // Remover listeners antigos para evitar duplicação
+  const closeBtn = modal.querySelector(".modal-close");
+  if (closeBtn) {
+    const newCloseBtn = closeBtn.cloneNode(true);
+    closeBtn.replaceWith(newCloseBtn);
+    newCloseBtn.addEventListener("click", () => {
+      UI.closeModal();
+    });
+  }
 
   // Clique no overlay
   modal.addEventListener("click", (e) => {
     if (e.target === modal) UI.closeModal();
-  });
+  }, { once: true });
 
   // Quantidade
-  document.getElementById("qtyMinus").addEventListener("click", () => {
-    AppState.currentQty = Math.max(1, AppState.currentQty - 1);
-    qtyValue.textContent = AppState.currentQty;
-  });
+  const qtyMinus = modal.querySelector("#qtyMinus");
+  const qtyPlus = modal.querySelector("#qtyPlus");
 
-  document.getElementById("qtyPlus").addEventListener("click", () => {
-    if (product.stock > 0) {
-      AppState.currentQty = Math.min(product.stock, AppState.currentQty + 1);
+  if (qtyMinus) {
+    qtyMinus.addEventListener("click", () => {
+      AppState.currentQty = Math.max(1, AppState.currentQty - 1);
       qtyValue.textContent = AppState.currentQty;
-    }
-  });
+    });
+  }
 
-  // Adicionar ao carrinho
-  addBtn.addEventListener("click", () => {
-    if (product.stock > 0) {
-      Cart.add(AppState.currentProductId, AppState.currentQty);
-      UI.updateCartCount();
-      UI.showToast(`✓ ${AppState.currentQty}x ${product.name} adicionado!`);
-      UI.closeModal();
-    }
-  });
+  if (qtyPlus) {
+    qtyPlus.addEventListener("click", () => {
+      if (product.stock > 0) {
+        AppState.currentQty = Math.min(product.stock, AppState.currentQty + 1);
+        qtyValue.textContent = AppState.currentQty;
+      }
+    });
+  }
 
-  // Tecla ESC
-  document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape" && modal.classList.contains("open")) {
-      UI.closeModal();
-    }
-  });
+  // Adicionar ao carrinho (BUG FIX #3: null check)
+  if (addBtn) {
+    addBtn.addEventListener("click", () => {
+      if (product.stock > 0) {
+        Cart.add(AppState.currentProductId, AppState.currentQty);
+        UI.updateCartCount();
+        UI.showToast(`✓ ${AppState.currentQty}x ${product.name} adicionado!`);
+        UI.closeModal();
+      } else {
+        UI.showToast("❌ Produto indisponível");
+      }
+    });
+  }
 }
 
 // ============ Carrinho ============
@@ -324,15 +351,189 @@ function setupOtherFeatures() {
   document.getElementById("footerTagline").textContent = STORE_CONFIG.description;
 }
 
+// ============ AVALIAÇÕES — Star Picker (Produtos) ============
+
+function setupProductStarPicker() {
+  const picker = document.getElementById("productStarPicker");
+  if (!picker) return;
+
+  const stars = picker.querySelectorAll(".star");
+  const valueInput = document.getElementById("ratingValue");
+
+  stars.forEach(star => {
+    star.addEventListener("click", () => {
+      const rating = Number(star.dataset.rating);
+      valueInput.value = rating;
+      
+      stars.forEach((s, idx) => {
+        s.classList.toggle("active", idx < rating);
+      });
+    });
+
+    star.addEventListener("mouseover", () => {
+      const rating = Number(star.dataset.rating);
+      stars.forEach((s, idx) => {
+        s.style.opacity = idx < rating ? "1" : "0.3";
+      });
+    });
+  });
+
+  picker.addEventListener("mouseleave", () => {
+    stars.forEach(s => s.style.opacity = "1");
+  });
+}
+
+function setupProductRatingForm(productId) {
+  const form = document.getElementById("addProductRatingForm");
+  if (!form) return;
+
+  const textarea = form.querySelector(".rating-textarea");
+  const charCount = form.querySelector(".char-count");
+
+  if (textarea) {
+    textarea.addEventListener("input", () => {
+      charCount.textContent = `${textarea.value.length}/500 caracteres`;
+    });
+  }
+
+  form.addEventListener("submit", (e) => {
+    e.preventDefault();
+
+    const name = form.querySelector("#ratingName").value || "Anônimo";
+    const rating = Number(form.querySelector("#ratingValue").value);
+    const title = form.querySelector("#ratingTitle").value;
+    const text = form.querySelector("#ratingText").value;
+    const msgEl = form.querySelector("#ratingFormMsg");
+
+    if (rating < 1) {
+      msgEl.textContent = "❌ Selecione uma avaliação";
+      msgEl.className = "form-message error";
+      msgEl.classList.remove("hidden");
+      return;
+    }
+
+    if (!text.trim()) {
+      msgEl.textContent = "❌ Escreva um comentário";
+      msgEl.className = "form-message error";
+      msgEl.classList.remove("hidden");
+      return;
+    }
+
+    const result = Ratings.addProductRating(productId, { name, rating, title, text });
+
+    if (!result.ok) {
+      msgEl.textContent = "❌ " + result.error;
+      msgEl.className = "form-message error";
+      msgEl.classList.remove("hidden");
+      return;
+    }
+
+    msgEl.textContent = "✓ Avaliação enviada com sucesso!";
+    msgEl.className = "form-message success";
+    msgEl.classList.remove("hidden");
+
+    form.reset();
+    document.getElementById("ratingValue").value = "0";
+    document.querySelectorAll("#productStarPicker .star").forEach(s => s.classList.remove("active"));
+    
+    UI.renderProductRatings(productId);
+    
+    setTimeout(() => msgEl.classList.add("hidden"), 3000);
+  });
+}
+
+// ============ AVALIAÇÕES — Star Picker (Loja) ============
+
+function setupStoreStarPicker() {
+  const picker = document.getElementById("storeStarPicker");
+  if (!picker) return;
+
+  const stars = picker.querySelectorAll(".star");
+  const valueInput = document.getElementById("storeRatingValue");
+
+  stars.forEach(star => {
+    star.addEventListener("click", () => {
+      const rating = Number(star.dataset.rating);
+      valueInput.value = rating;
+      
+      stars.forEach((s, idx) => {
+        s.classList.toggle("active", idx < rating);
+      });
+    });
+
+    star.addEventListener("mouseover", () => {
+      const rating = Number(star.dataset.rating);
+      stars.forEach((s, idx) => {
+        s.style.opacity = idx < rating ? "1" : "0.3";
+      });
+    });
+  });
+
+  picker.addEventListener("mouseleave", () => {
+    stars.forEach(s => s.style.opacity = "1");
+  });
+}
+
+function setupStoreRatingForm() {
+  const form = document.getElementById("addStoreRatingForm");
+  if (!form) return;
+
+  const textarea = form.querySelector(".rating-textarea");
+  const charCount = form.querySelector(".char-count");
+
+  if (textarea) {
+    textarea.addEventListener("input", () => {
+      charCount.textContent = `${textarea.value.length}/500 caracteres`;
+    });
+  }
+
+  form.addEventListener("submit", (e) => {
+    e.preventDefault();
+
+    const name = form.querySelector("#storeRatingName").value || "Anônimo";
+    const rating = Number(form.querySelector("#storeRatingValue").value);
+    const text = form.querySelector("#storeRatingText").value;
+    const msgEl = form.querySelector("#storeRatingFormMsg");
+
+    if (rating < 1) {
+      msgEl.textContent = "❌ Selecione uma avaliação";
+      msgEl.className = "form-message error";
+      msgEl.classList.remove("hidden");
+      return;
+    }
+
+    if (!text.trim()) {
+      msgEl.textContent = "❌ Escreva um comentário";
+      msgEl.className = "form-message error";
+      msgEl.classList.remove("hidden");
+      return;
+    }
+
+    const result = Ratings.addStoreRating({ name, rating, text });
+
+    if (!result.ok) {
+      msgEl.textContent = "❌ " + result.error;
+      msgEl.className = "form-message error";
+      msgEl.classList.remove("hidden");
+      return;
+    }
+
+    msgEl.textContent = "✓ Avaliação enviada com sucesso!";
+    msgEl.className = "form-message success";
+    msgEl.classList.remove("hidden");
+
+    form.reset();
+    document.getElementById("storeRatingValue").value = "0";
+    document.querySelectorAll("#storeStarPicker .star").forEach(s => s.classList.remove("active"));
+    
+    UI.renderStoreRatings();
+    UI.renderStoreRatingForm();
+    
+    setTimeout(() => msgEl.classList.add("hidden"), 3000);
+  });
+}
+
 // ============ Utilidades ============
 
-window.addEventListener("keydown", (e) => {
-  // Fechar modal com ESC
-  if (e.key === "Escape") {
-    const modal = document.getElementById("productModal");
-    if (modal.classList.contains("open")) UI.closeModal();
-
-    const cart = document.getElementById("cartOverlay");
-    if (cart.classList.contains("open")) UI.closeCart();
-  }
-});
+// BUG FIX #4: Remover listener duplicado - já definido em setupModalEvents
+// Este listener global foi removido para evitar memory leak

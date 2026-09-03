@@ -11,10 +11,10 @@ const STORE_CONFIG = {
   description: "Cosméticos premium selecionados com cuidado para você brilhar a cada dia.",
   
   // === CONTATO (preencha com dados REAIS antes de publicar) ===
-  whatsapp: "5511945661766",      // Formato: 5511987654321 (55 + DDD + número, sem símbolos)
+  whatsapp: "1145661766",      // Formato: 5511987654321 (55 + DDD + número, sem símbolos)
   phone: "",         // Formato: (11) 99999-9999 (opcional)
-  email: "bcbeautymake@gmail.com",         // exemplo@email.com (opcional)
-  address: "Rua Onze De Abril, 2",       // Rua Nome, 123 — Bairro, São Paulo, SP (se houver retirada física)
+  email: "bcbeauty@gmail.com",         // exemplo@email.com (opcional)
+  address: "Rua Onze de Abril, 2",       // Rua Nome, 123 — Bairro, São Paulo, SP (se houver retirada física)
   
   // === REDES SOCIAIS (deixar vazio se ainda não tiver) ===
   instagram: "bcbeauty.oficial",     // username SEM @
@@ -39,7 +39,6 @@ const STORE_CONFIG = {
   
   // === CONFIGURAÇÕES DE DESENVOLVIMENTO ===
   debug: false,      // true = mostra logs no console
-  demo: true,        // true = mostra dados de exemplo; false = hide demo content
   
   // === POLÍTICA DE ENTREGA (opcional) ===
   deliveryPolicy: "", // "Entrega em São Paulo: 1-3 dias úteis"
@@ -47,10 +46,24 @@ const STORE_CONFIG = {
 };
 
 // === VALIDAÇÃO AUTOMÁTICA ===
-// Avisa se a loja tem config vazia (modo demo)
-if (STORE_CONFIG.demo && !STORE_CONFIG.whatsapp) {
-  console.log("📝 Modo DEMO ativo. Preencha STORE_CONFIG com dados reais antes de publicar.");
-}
+// BUG FIX #6: Validação de configuração
+(function validateConfig() {
+  // Verificar currency válida
+  const validCurrencies = ["BRL", "USD", "EUR"];
+  if (!validCurrencies.includes(STORE_CONFIG.currency)) {
+    console.warn(`⚠️ Moeda "${STORE_CONFIG.currency}" pode não ser suportada. Use: ${validCurrencies.join(", ")}`);
+  }
+
+  // Validar formato do WhatsApp
+  if (STORE_CONFIG.whatsapp && !/^\d{10,15}$/.test(STORE_CONFIG.whatsapp)) {
+    console.warn("⚠️ Formato de WhatsApp pode estar incorreto. Use apenas números (55 + DDD + número)");
+  }
+
+  // Avisar sobre dados faltando
+  if (!STORE_CONFIG.whatsapp) {
+    console.warn("⚠️ WhatsApp não configurado. Preencha em config.js");
+  }
+})();
 
 // Links formatados (não altere, sistema preenche automaticamente)
 const STORE_LINKS = {
@@ -73,4 +86,6 @@ const STORE_LINKS = {
   },
 };
 
-
+// As avaliações de clientes são carregadas de localStorage
+// Nenhum dado fictício é mostrado. A seção de avaliações
+// exibirá "Nenhuma avaliação ainda" até que clientes avaliem.
