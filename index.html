@@ -46,13 +46,29 @@
   <a href="#mainContent" class="skip-to-main">Pular para conteúdo principal</a>
 
   <!-- V-Libras Button (Videoconferência em Libras) - Acessibilidade em Libras -->
-  <script type="text/javascript" src="https://vlibras.gov.br/app.js"></script>
   <div vw class="enabled">
-    <button vw-access-button class="vw-button-libras" title="Acessibilidade em Libras - Intérprete Virtual de Libras">Acessibilidade em Libras</button>
+    <div vw-access-button class="vw-button-libras" title="Acessibilidade em Libras - Intérprete Virtual de Libras"></div>
     <div vw-plugin-wrapper>
       <div class="vw-plugin" vw-plugin-type="top_right"></div>
     </div>
   </div>
+  <script type="text/javascript" src="https://vlibras.gov.br/app.js"></script>
+  <script type="text/javascript">
+    (function () {
+      function initVLibras() {
+        if (window.VLibras) {
+          new window.VLibras.Widget('https://vlibras.gov.br/app');
+        }
+      }
+      // O app.js do VLibras é carregado de forma síncrona logo acima,
+      // mas aguardamos o "load" da página como garantia extra em conexões lentas.
+      if (document.readyState === "complete") {
+        initVLibras();
+      } else {
+        window.addEventListener("load", initVLibras);
+      }
+    })();
+  </script>
 
   <!-- ============ HEADER ============ -->
   <header class="site-header" role="banner">
